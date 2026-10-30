@@ -49,7 +49,7 @@ const Home = () => {
       <section className="relative h-[60vh] md:h-[80vh]">
         <Swiper
           modules={[Autoplay, Pagination]}
-          autoplay={{ delay: 5000 }}
+          autoplay={{ delay: 4000 }}
           pagination={{ clickable: true }}
           loop
           className="h-full"
