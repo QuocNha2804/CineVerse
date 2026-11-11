@@ -13,12 +13,18 @@ export const useFetch = (fetchFn, deps = [], options = {}) => {
       setError(null);
       try {
         const result = await fetchFn(...args);
-        if (isMountedRef.current) setData(result);
+        if (isMountedRef.current) {
+          setData(result);
+        }
         return result;
       } catch (err) {
-        if (isMountedRef.current) setError(err);
+        if (isMountedRef.current) {
+          setError(err);
+        }
       } finally {
-        if (isMountedRef.current) setLoading(false);
+        if (isMountedRef.current) {
+          setLoading(false);
+        }
       }
     },
     [fetchFn],
@@ -26,11 +32,16 @@ export const useFetch = (fetchFn, deps = [], options = {}) => {
 
   useEffect(() => {
     isMountedRef.current = true;
-    if (immediate) execute();
+    if (immediate) {
+      void Promise.resolve().then(() => {
+        if (isMountedRef.current) execute();
+      });
+    }
     return () => {
       isMountedRef.current = false;
     };
-  }, deps);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [...deps, execute, immediate]);
 
   const refetch = useCallback(() => execute(), [execute]);
   return { data, loading, error, refetch, execute };

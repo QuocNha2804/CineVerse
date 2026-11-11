@@ -1,57 +1,65 @@
-import { Routes, Route, Navigate } from "react-router-dom";
+import { lazy, Suspense } from "react";
+import { Routes, Route } from "react-router-dom";
 import Layout from "../components/layout/Layout";
-import Home from "../pages/Home";
-import Explore from "../pages/Explore";
-import Search from "../pages/Search";
-import MovieDetail from "../pages/MovieDetail";
-import Watchlist from "../pages/Watchlist";
-import History from "../pages/History";
-import Profile from "../pages/Profile";
-import { Login } from "../pages/Login";
-import { Register } from "../pages/Register";
-import NotFound from "../pages/NotFound";
-import { useAuth } from "../context/AuthContext";
+import ProtectedRoute from "./ProtectedRoute";
 
-const ProtectedRoute = ({ children }) => {
-  const { user } = useAuth();
-  return user ? children : <Navigate to="/login" replace />;
-};
+// Code splitting các trang bằng lazy loading
+const Home = lazy(() => import("../pages/Home"));
+const Explore = lazy(() => import("../pages/Explore"));
+const Search = lazy(() => import("../pages/Search"));
+const MovieDetail = lazy(() => import("../pages/MovieDetail"));
+const Watchlist = lazy(() => import("../pages/Watchlist"));
+const History = lazy(() => import("../pages/History"));
+const Profile = lazy(() => import("../pages/Profile"));
+const Login = lazy(() => import("../pages/Login"));
+const Register = lazy(() => import("../pages/Register"));
+const NotFound = lazy(() => import("../pages/NotFound"));
+
+const PageLoading = () => (
+  <div className="min-h-[60vh] flex flex-col items-center justify-center">
+    <div className="w-10 h-10 border-3 border-primary border-t-transparent rounded-full animate-spin mb-3" />
+    <span className="text-xs font-semibold text-gray-400">Đang tải trang...</span>
+  </div>
+);
 
 const AppRoutes = () => (
-  <Routes>
-    <Route element={<Layout />}>
-      <Route path="/" element={<Home />} />
-      <Route path="/explore" element={<Explore />} />
-      <Route path="/search" element={<Search />} />
-      <Route path="/movie/:id" element={<MovieDetail />} />
-      <Route path="/login" element={<Login />} />
-      <Route path="/register" element={<Register />} />
-      <Route
-        path="/watchlist"
-        element={
-          <ProtectedRoute>
-            <Watchlist />
-          </ProtectedRoute>
-        }
-      />
-      <Route
-        path="/history"
-        element={
-          <ProtectedRoute>
-            <History />
-          </ProtectedRoute>
-        }
-      />
-      <Route
-        path="/profile"
-        element={
-          <ProtectedRoute>
-            <Profile />
-          </ProtectedRoute>
-        }
-      />
-      <Route path="*" element={<NotFound />} />
-    </Route>
-  </Routes>
+  <Suspense fallback={<PageLoading />}>
+    <Routes>
+      <Route element={<Layout />}>
+        <Route path="/" element={<Home />} />
+        <Route path="/explore" element={<Explore />} />
+        <Route path="/search" element={<Search />} />
+        <Route path="/movie/:id" element={<MovieDetail />} />
+        <Route path="/login" element={<Login />} />
+        <Route path="/register" element={<Register />} />
+        <Route
+          path="/watchlist"
+          element={
+            <ProtectedRoute>
+              <Watchlist />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/history"
+          element={
+            <ProtectedRoute>
+              <History />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/profile"
+          element={
+            <ProtectedRoute>
+              <Profile />
+            </ProtectedRoute>
+          }
+        />
+        <Route path="*" element={<NotFound />} />
+      </Route>
+    </Routes>
+  </Suspense>
 );
+
 export default AppRoutes;
